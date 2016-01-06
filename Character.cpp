@@ -12,6 +12,7 @@ Character::Character() {
 	;
 }
 
-Character::Character(ActionID id) {
+Character::Character(OBJECTid id) {
 	this->id = id;
+
 }
