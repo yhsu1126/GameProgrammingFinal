@@ -1,0 +1,13 @@
+#ignore all data stuff include win32
+Data/*
+Include/*
+LibWin32/*
+Debug/*
+Readme.txt
+*.ico
+*.rc
+*.vcxproj
+Resource.h
+stdafx.*
+*.filters
+targetver.h
