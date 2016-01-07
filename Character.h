@@ -1,18 +1,18 @@
 #pragma once
-#ifndef _FlyWin32_H_
-#define _FlyWin32_H_
-#include <iostream>
-#include <string>
-#include "FlyWin32.h"
+#ifndef FLY2
+#define FLY2
+#include "library.h"
 #endif
+using namespace std;
 
-class Character : public FnCharacter;
+class Character;
 
 class Character : public FnCharacter {
 private:
 	string name;
 	OBJECTid id;
 	ACTIONid curposeID;
+
 public:
 	Character();
 	Character(OBJECTid);

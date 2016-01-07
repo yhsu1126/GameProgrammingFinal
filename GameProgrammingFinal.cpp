@@ -9,7 +9,6 @@ void FyMain(int argc, char **argv)
 {
 	OutputDebugString(_T("My output string.OAO OAO\n"));
 	FnCharacter actor;
-	actor.getAlla
 	// invoke the system
 	FyInvokeFly(TRUE);
 }
