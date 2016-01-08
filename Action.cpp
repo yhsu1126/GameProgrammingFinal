@@ -21,7 +21,8 @@ Action::Action(int id, string description, float speed,
 	this->basicCoolDown = basicCoolDown;
 }
 Action::~Action(){
-	this->setDescription(NULL);
+	if (this->description!=NULL)
+		delete this->description;
 }
 //ID
 int Action::getId(){
