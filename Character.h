@@ -8,15 +8,19 @@ using namespace std;
 class Character : public FnCharacter {
 private:
 	string name;
-	OBJECTid id;
+	CHARACTERid id;
 	ACTIONid curposeID;
 	ACTIONid defaultposeID;
-	Action actions;
+	map<ACTIONid,Action> actions;
 	int remainFrame;
 	float normalSpeed, minSpeed, maxSpeed;
 	vector<Effect>effectStack;
 
 public:
 	Character();
-	Character(OBJECTid id);
+	Character(string name);
+	~Character();
+	void initializeAction();
+	void addAction(Action a);
+	void deleteAction(ACTIONid id);
 };

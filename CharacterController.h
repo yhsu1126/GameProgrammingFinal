@@ -12,7 +12,7 @@ private:
 	map<OBJECTid, Character>characterList;
 public:
 	CharacterController();
-	void addCharacter(Character character);
-	void deleteCharacter(OBJECTid id);
+	void addCharacter(Character character, CHARACTERid id);
+	void deleteCharacter(CHARACTERid id);
 	void playAction();
 };

@@ -1,14 +1,14 @@
+#include "stdafx.h"
 #include"CharacterController.h"
 
 using namespace std;
 
-void CharacterController::addCharacter(Character character) {
-	characterList[character.GetBaseObject()] = character;
+void CharacterController::addCharacter(Character character,CHARACTERid characterid) {
+	characterList[characterid] = character;
 }
 
-void CharacterController::deleteCharacter(OBJECTid id) {
-	map<OBJECTid, Character>::iterator it = characterList.find(id);
-	characterList.erase(id);
+void CharacterController::deleteCharacter(CHARACTERid characterid) {
+	characterList.erase(characterid);
 }
 
 void CharacterController::playAction() {

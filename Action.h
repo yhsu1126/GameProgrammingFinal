@@ -9,38 +9,28 @@ using namespace std;
 
 class Action {
 private:
-	int id;
-	string description;
+	ACTIONid id;
+	string name;
+	string cwaname;
 	float speed;
 	float range;
-	float coolDown;
-	float basicCoolDown;
 public:
     Action(); 
-	Action(int,string,float,float,float,float);
+	Action(string name, string cwaname, float speed,float range);
     ~Action();
 	
 	int getId();
 	void setId(int);
 	
-	string getDescription();
-	void setDescription(string);
+	string getName();
+	void setName(string name);
+
+	string getCwaname();
+	void setCwaname(string name);
 	
 	float getSpeed();
 	void setSpeed(float);
 	
 	float getRange();
 	void setRange(float);
-	
-	float getCoolDown();
-	void setCoolDown(float);
-	
-	float getBasicCoolDown();
-	void setBasicCoolDown(float);
-	
-	
-	
-	
-	
-	
 };

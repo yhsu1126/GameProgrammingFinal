@@ -17,7 +17,9 @@ private:
 	float centerPointuDir[3];
 	float centerPointfDir[3];
 public:
+	Map();
 	Map(string fileName); //Map uses String text file. which include the map edges with two vertex as the value
+	void constructMap(string fileName);
 	void addEdge(Edge edge);
 	void addEdge(float *vertex1, float *vertex2);
 };
