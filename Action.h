@@ -1,6 +1,7 @@
 #pragma once
 #ifndef FLY2
 #define FLY2
+#include "string.h"
 #include "library.h"
 #endif
 
@@ -8,23 +9,38 @@ using namespace std;
 
 class Action {
 private:
-	map<ACTIONid, int> allAction;
-	float speed;
+	int id;
 	string description;
+	float speed;
 	float range;
 	float coolDown;
 	float basicCoolDown;
 public:
-	map <ACTIONid, int> getAllAction();
-	float getSpeed();
+    Action(); 
+	Action(int,string,float,float,float,float);
+    ~Action();
+	
+	int getId();
+	void setId(int);
+	
 	string getDescription();
-	float getRange();
-	float getCoolDown();
-	float getBasicCoolDown();
-	void setAllAction(map <ACTIONid, int>);
-	void setSpeed(float);
 	void setDescription(string);
+	
+	float getSpeed();
+	void setSpeed(float);
+	
+	float getRange();
 	void setRange(float);
+	
+	float getCoolDown();
 	void setCoolDown(float);
+	
+	float getBasicCoolDown();
 	void setBasicCoolDown(float);
+	
+	
+	
+	
+	
+	
 };
