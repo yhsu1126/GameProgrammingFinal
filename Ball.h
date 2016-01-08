@@ -5,18 +5,18 @@
 #endif
 using namespace std;
 
-class Character;
+class Ball;
 
-class Character : public FnCharacter {
+class Ball : public FnCharacter {
 private:
 	string name;
 	OBJECTid id;
 	ACTIONid curposeID;
 	Action actions;
-	int remainFrame;
-	vector<Effect>effectStack;
+	float speed;
+	float size;
 
 public:
-	Character();
-	Character(OBJECTid);
+	Ball();
+	Ball(OBJECTid);
 };

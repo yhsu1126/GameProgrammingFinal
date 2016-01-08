@@ -11,7 +11,7 @@ private:
 	string description;
 	float coolDown;
 	float currentTime;
-	int typeofEffect
+	int typeofEffect;
 public:
 	Effect();
 	string getDescription();
@@ -22,4 +22,6 @@ public:
 	void setCoolDown(float);
 	void setCurrentTime(float);
 	void setTypeofEffect(int);
+	void decreaseCooldown(float);
+	void decreateCooldown();
 };
