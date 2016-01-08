@@ -5,8 +5,6 @@
 #endif
 using namespace std;
 
-class Ball;
-
 class Ball : public FnCharacter {
 private:
 	string name;

@@ -4,7 +4,6 @@
 #include "library.h"
 #endif
 using namespace std;
-class Effect;
 
 class Effect {
 private:
@@ -18,10 +17,9 @@ public:
 	float getCoolDown();
 	float getCurrentTime();
 	int getTypeofEffect();
-	void setDescription(string);
-	void setCoolDown(float);
-	void setCurrentTime(float);
-	void setTypeofEffect(int);
-	void decreaseCooldown(float);
-	void decreateCooldown();
+	void setDescription(string description);
+	void setCoolDown(float coolDown);
+	void setCurrentTime(float currentTime);
+	void setTypeofEffect(int type);
+	void decreaseCooldown(float interval= 1.0f);
 };

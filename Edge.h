@@ -4,15 +4,13 @@
 #include "library.h"
 #endif
 
-class Edge;
-
 class Edge {
 private:
-	float vertex1[3]
+	float vertex1[3];
 	float vertex2[3];
 	float normal[3];
 	float dir[3];
 	int type;
 public:
-	Edge(float*, float*);
+	Edge(float *vertex1, float *vertex2);
 };

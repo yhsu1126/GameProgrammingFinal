@@ -6,8 +6,6 @@
 
 using namespace std;
 
-class Action;
-
 class Action {
 private:
 	map<ACTIONid, int> allAction;
