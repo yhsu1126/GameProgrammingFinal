@@ -10,5 +10,6 @@ public:
 	CharacterController();
 	void addCharacter(Character character, CHARACTERid id);
 	void deleteCharacter(CHARACTERid id);
-	void playAction();
+	void startPlayAction();
+	void playAction(int skip);
 };

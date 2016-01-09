@@ -2,10 +2,12 @@
 #include "stdafx.h"
 using namespace std;
 
-ArenaController::ArenaController(string sceneName, string Datapath, int goal, int mapid, int width, int height, string player1, string player2, int powerupAmount){
+void ArenaController::startGame(string sceneName, string Datapath, int goal, int mapid, int width, int height, string player1, string player2, int powerupAmount){
 	createScene(sceneName, Datapath, mapid, width, height);
 	arenaLoadCharacter(player1,player2);
-	loadPowerupItem(powerupAmount);
+	setupCamera();
+	OutputDebugString(_T("Finish doing the job 0w0\n"));
+	//loadPowerupItem(powerupAmount);
 }
 
 void ArenaController::createScene(string sceneName, string Datapath, int mapid, int width, int height) {
@@ -86,6 +88,57 @@ void ArenaController::arenaLoadCharacter(string player1, string player2) {
 	character2.PutOnTerrain(pos2);
 	character1.SetDirection(fDir1, uDir);
 	character2.SetDirection(fDir2, uDir);
+	character_Control.startPlayAction();
+}
+
+void ArenaController::setupCamera() {
+	FnScene scene;
+	scene.ID(sid);
+	cID = scene.CreateObject(CAMERA);
+	FnCamera camera;
+	camera.ID(cID);
+	camera.SetNearPlane(5.0f);
+	camera.SetFarPlane(100000.0f);
+	float cameraPos[3], camerafDir[3], camerauDir[3];
+	float horDistance = cameraDis*cos(elevation*PI / 180.0);
+	float verDistance = cameraDis*sin(elevation*PI / 180.0);
+	Character mainPlayer;
+	mainPlayer.ID(ch1);
+	float mainPos[3], mainuDir[3], mainfDir[3];
+	mainPlayer.GetPosition(mainPos);
+	mainPlayer.GetDirection(mainfDir, mainuDir);
+	//set camera position
+	cameraPos[0] = mainPos[0] - mainfDir[0] * horDistance;
+	cameraPos[1] = mainPos[1] - mainfDir[1] * horDistance;
+	cameraPos[2] = verDistance;
+	//set camera direction
+	mainfDir[0] = mainPos[0] - cameraPos[0];
+	mainfDir[1] = mainPos[1] - cameraPos[1];
+	mainfDir[2] = -cameraPos[2];
+	unitVector(mainfDir, 3);
+	//set camera up
+	if (mainfDir[2] == 0) {
+		mainuDir[0] = 0;
+		mainuDir[1] = 0;
+		mainuDir[2] = 1;
+	}
+	else {
+		mainuDir[0] = mainfDir[0];
+		mainuDir[1] = mainfDir[1];
+		mainuDir[2] = -(mainfDir[0] * mainfDir[0] + mainfDir[1] * mainfDir[1]) / mainfDir[2];
+	}
+	//fix the camerapos high
+	cameraPos[2] += 60.0f;
+	camera.SetPosition(cameraPos);
+	camera.SetDirection(camerafDir, camerauDir);
+}
+
+void ArenaController::renderArena(int skip) {
+	FnViewport vp;
+	// render the whole scene
+	vp.ID(vid1);
+	vp.Render3D(cID, TRUE, TRUE);
+	FySwapBuffers();
 }
 
 void ArenaController::loadPowerupItem(int amount) {
