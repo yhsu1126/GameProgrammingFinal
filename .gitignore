@@ -2,9 +2,6 @@
 Data/*
 Include/*
 LibWin32/*
-<<<<<<< HEAD
-Debug/*
-=======
 Debug/*
 Readme.txt
 *.ico
@@ -13,5 +10,4 @@ Readme.txt
 Resource.h
 stdafx.*
 *.filters
-targetver.h
->>>>>>> parent of 56141c2... add stdafx support
+targetver.h 
