@@ -2,4 +2,16 @@
 Data/*
 Include/*
 LibWin32/*
+<<<<<<< HEAD
 Debug/*
+=======
+Debug/*
+Readme.txt
+*.ico
+*.rc
+*.vcxproj
+Resource.h
+stdafx.*
+*.filters
+targetver.h
+>>>>>>> parent of 56141c2... add stdafx support
