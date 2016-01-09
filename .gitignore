@@ -8,6 +8,5 @@ Readme.txt
 *.rc
 *.vcxproj
 Resource.h
-stdafx.*
 *.filters
 targetver.h
