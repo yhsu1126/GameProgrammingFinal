@@ -11,8 +11,10 @@ Action::Action(string name, string cwaname, float speed, float range) {
 	this->cwaname = name;
 	this->speed = speed;
 	this->range = range;
+	this->length = -1;
 }
 Action::~Action(){
+	this->length = -1;
 }
 //ID
 ACTIONid Action::getId() {
@@ -50,4 +52,12 @@ float Action::getRange(){
 }
 void Action::setRange(float range){
 	this->range = range;
+}
+
+// get the length of the action
+int Action::getLength() {
+	return this->length;
+}
+void Action::setLength(int length) {
+	this->length = length;
 }

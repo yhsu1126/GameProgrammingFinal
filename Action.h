@@ -29,4 +29,7 @@ public:
 	
 	float getRange();
 	void setRange(float);
+
+	int getLength();
+	void setLength(int length);
 };
