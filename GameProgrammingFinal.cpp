@@ -374,7 +374,7 @@ void RenderIt(int skip)
 		float curTime;
 
 		curTime = FyTimerCheckTime(0);
-		sprintf(string, "Fps: %6.2f", frame / curTime);
+		//sprintf(string, "Fps: %6.2f", frame / curTime);
 	}
 
 	frame += skip;
@@ -402,7 +402,7 @@ void RenderIt(int skip)
 		}
 	}
 	//Do the hit test control
-	if (lyubuAction > 0 && lyubuAction%hitTest[curPoseID] == 0 && distBetweenTwoPoints(enemypos, actorPos) <= 115.0f) {
+	/*if (lyubuAction > 0 && lyubuAction%hitTest[curPoseID] == 0 && distBetweenTwoPoints(enemypos, actorPos) <= 115.0f) {
 		//hit
 		enemyPosID = actionDamage[curPoseID] > 1 ? damageH : damageL;
 		enemy.SetCurrentAction(NULL, 0, enemyPosID);
@@ -411,7 +411,7 @@ void RenderIt(int skip)
 		if (enemyhp <= 0) {
 			die();
 		}
-	}
+	}*/
 	// if hp is lower then zero kill the stuff
 	//debug part
 	/*FnText text;
@@ -478,7 +478,6 @@ void Movement(BYTE code, BOOL4 value)
 				curPoseID = runID;
 				actor.SetCurrentAction(0, NULL, curPoseID);
 				actor.Play(START, 0.0f, FALSE, TRUE);
-				attackCombo = 0;
 			}
 		}
 	}
@@ -490,14 +489,14 @@ void Attack(BYTE code, BOOL4 value) {
 	FnCharacter actor;
 	actor.ID(actorID);
 	if (value) {
-		if (code == FY_A) {
-			curPoseID = normalAttackID[attackCombo];
+		if (code == FY_A && (actor.GetCurrentAction(NULL) == runID || actor.GetCurrentAction(NULL) == idleID)) {
+			curPoseID = normalAttackID[2];
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
 		}
-		else if (code == FY_S) {
-			curPoseID = attackCombo <3 ? heavyAttackID[attackCombo] : normalAttackID[attackCombo];
+		else if (code == FY_S && (actor.GetCurrentAction(NULL) == runID || actor.GetCurrentAction(NULL) == idleID)) {
+			curPoseID = heavyAttackID[0];
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
