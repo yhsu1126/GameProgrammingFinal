@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #pragma once
 #ifndef FLY2
 #define FLY2
@@ -34,7 +35,7 @@ void Action::setSpeed(float speed){
 }
 //name
 string Action::getName(){
-	return this->getName;
+	return this->name;
 }
 void Action::setName(string name){
 	this->name = name;

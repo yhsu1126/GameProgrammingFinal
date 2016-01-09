@@ -25,7 +25,7 @@ void Character::initializeAction() {
 			idle.setId(idleID);
 			this->addAction(idle);
 			Action walking("Walk", "Run", 0.0f, 40.0f);
-			+char walk_str[100];
+			char walk_str[100];
 			strtoChar(walk_str, walking.getCwaname());
 			walkID = this->GetBodyAction(NULL, walk_str);
 			walking.setId(walkID);
@@ -86,7 +86,7 @@ void Character::initializeAction() {
 }
 
 void Character::addAction(Action a) {
-	actions[a.getId] = a;
+	actions[a.getId()] = a;
 }
 
 void Character::deleteAction(ACTIONid id) {
