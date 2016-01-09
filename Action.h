@@ -16,11 +16,11 @@ private:
 	float range;
 public:
     Action(); 
-	Action(string name, string cwaname, float speed,float range);
+	Action(string name, string cwaname, float speed, float range);
     ~Action();
 	
-	int getId();
-	void setId(int);
+	ACTIONid getId();
+	void setId(ACTIONid id);
 	
 	string getName();
 	void setName(string name);

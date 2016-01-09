@@ -13,6 +13,9 @@ private:
 	vector<Edge> edges;
 	float pos1[3];
 	float pos2[3];
+	float fDir1[3];
+	float fDir2[3];
+	float uDir[3];
 	float centerPoint[3];
 	float centerPointuDir[3];
 	float centerPointfDir[3];
@@ -22,4 +25,12 @@ public:
 	void constructMap(string fileName);
 	void addEdge(Edge edge);
 	void addEdge(float *vertex1, float *vertex2);
+	void getPos1(float *pos);
+	void getPos2(float *pos);
+	void getfDir1(float *fDir);
+	void getfDir2(float *fDir);
+	void getuDir(float *uDir);
+	void getcenterPointPos(float *pos);
+	void getcenterPointfDir(float *fDir);
+	void getcenterPointuDir(float *uDir);
 };
