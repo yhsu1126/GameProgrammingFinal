@@ -10,7 +10,8 @@
 Action::Action(){
 	;
 }
-Action::Action(string name,string cwaname, float speed, float range){
+Action::Action(ACTIONid id, string name,string cwaname, float speed, float range){
+	this->id = id;
 	this->name = name;
 	this->cwaname = name;
 	this->speed = speed;
@@ -19,10 +20,10 @@ Action::Action(string name,string cwaname, float speed, float range){
 Action::~Action(){
 }
 //ID
-ACTIONid Action::getId(){
+int Action::getId(){
 	return this->id;
 }
-void Action::setId(ACTIONid id){
+void Action::setId(int id){
 	this->id = id;
 }
 //SPEED
