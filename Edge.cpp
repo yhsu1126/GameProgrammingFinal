@@ -13,6 +13,6 @@ Edge::Edge(float *v1, float *v2) {
 	normal[1] = dir[0];
 	type = 1;
 	
-	FyNormalizeVector3(dir)
-	FyNormalizeVector3(normal)
+	FyNormalizeVector3(dir);
+	FyNormalizeVector3(normal);
 }
