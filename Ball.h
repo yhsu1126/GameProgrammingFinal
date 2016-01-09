@@ -7,14 +7,18 @@ using namespace std;
 
 class Ball : public FnCharacter {
 private:
-	string name;
+	//string name;
 	OBJECTid id;
-	ACTIONid curposeID;
-	Action actions;
+	//ACTIONid curposeID;
+	//Action actions;
 	float speed;
 	float size;
 
 public:
 	Ball();
 	Ball(OBJECTid);
+	//collision - change the speed of ball
+	void Collision(Character);
+	void Collision(Edge);
+	void Move();
 };
