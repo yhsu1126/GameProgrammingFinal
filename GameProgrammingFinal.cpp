@@ -27,9 +27,14 @@ TEXTid textID = FAILED_ID;
 BOOL4 killed = FALSE;
 std::map<ACTIONid, int>actionLength, hitTest, actionDamage, hitTime, attackRange; // hitTest is the Interval for being hitted
 
+// Media
+MEDIAid mmID;
+AUDIOid backgroundSoundID, weapon1SoundID, weapon2SoundID;
+FnAudio backgroundSound, weapon1Sound, weapon2Sound;
 
-																				  // the centre of the rotation
-																				  //float centre[3];
+
+// the centre of the rotation
+// float centre[3];
 float dist = 1000.0f, height = 75.0f, rotatedistancefactor = 0.017453f;
 // some globals
 int frame = 0, direction = 1; // the global variable for direction
@@ -45,18 +50,33 @@ void Movement(BYTE, BOOL4); // The main stuff to do at here
 void Attack(BYTE, BOOL4); // the function to control the attack movement
 void die(); // just kill the enemy and make sure that he disappeared
 
-			// timer callbacks
-			// mouse callbacks
+// timer callbacks
+// mouse callbacks
 void InitElevation(int, int);
 void ElevationCam(int, int);
 void DistanceCam(int, int, float);
 int oldScroll, newScroll; //for test Mouse Scroll argument
 float dirScroll; //for test Mouse Scroll argument
-				 //camera follow function
+//camera follow function
 void followCam();
 void adjustCam();
 void enemyFollow(float*);
 float distBetweenTwoPoints(float*, float*);
+
+void createAudio( void ) {
+	backgroundSoundID = FyCreateAudio();
+	backgroundSound.ID( backgroundSoundID );
+	backgroundSound.Load( "background" );
+	// backgroundSound.Play( LOOP );
+	
+	weapon1SoundID = FyCreateAudio();
+	weapon1Sound.ID(weapon1SoundID);
+	weapon1Sound.Load("weapon1");
+	
+	weapon2SoundID = FyCreateAudio();
+	weapon2Sound.ID(weapon2SoundID);
+	weapon2Sound.Load("weapon2");
+}
 /*------------------
 the main program
 C.Wang 1010, 2014
@@ -70,7 +90,19 @@ void FyMain(int argc, char **argv)
 	FySetModelPath("Data\\Scenes");
 	FySetTexturePath("Data\\Scenes\\Textures");
 	FySetScenePath("Data\\Scenes");
-
+	FySetAudioPath("Data\\Media");
+	FyBeginMedia("Data\\Media", 2);
+	
+	// Load Media 
+	/*
+	mmID = FyCreateMediaPlayer("background4.mp3", 0, 0, 800, 600);
+	FnMedia mP;
+	mP.Object(mmID);
+	// mP.Play(ONCE);
+	// mP.SetVolume(0.1f);
+	*/
+	createAudio();
+	
 	// create a viewport
 	vID = FyCreateViewport(0, 0, 1024, 768);
 	FnViewport vp;
@@ -86,14 +118,14 @@ void FyMain(int argc, char **argv)
 	//scene.Load("terrain");
 	scene.SetAmbientLights(1.0f, 1.0f, 1.0f, 0.6f, 0.6f, 0.6f); //Sky Light(1.0f), Ground Light (0.6f)
 
-																// load the terrain
+	// load the terrain
 	tID = scene.CreateObject(OBJECT);
 	FnObject terrain;
 	terrain.ID(tID);
 	BOOL beOK1 = terrain.Load("terrain");
 	terrain.Show(FALSE); // Can comment out this line of code to show the path which user can walk
 
-						 // set terrain environment
+	// set terrain environment
 	terrainRoomID = scene.CreateRoom(SIMPLE_ROOM, 10);
 	FnRoom room;
 	room.ID(terrainRoomID);
@@ -112,7 +144,7 @@ void FyMain(int argc, char **argv)
 	enemy.ID(enemyID);
 
 	fstream infile;
-	infile.open("Data\\Scenes\\map\\map0.txt", ios::in);
+	infile.open("Data\\Scenes\\Map\\map0.txt", ios::in);
 	infile >> pos[0] >> pos[1] >> pos[2];
 	infile >> fDir[0] >> fDir[1] >> fDir[2];
 	uDir[0] = 0.0f; uDir[1] = 0.0f; uDir[2] = 1.0f;
@@ -236,10 +268,10 @@ void FyMain(int argc, char **argv)
 
 	// set Hotkeys
 	FyDefineHotKey(VK_ESCAPE, QuitGame, FALSE);  // escape for quiting the game
-												 //FyDefineHotKey(VK_UP, Movement, FALSE);      // Up for moving forward
+	//FyDefineHotKey(VK_UP, Movement, FALSE);      // Up for moving forward
 	FyDefineHotKey(VK_RIGHT, Movement, FALSE);   // Right for turning right
 	FyDefineHotKey(VK_LEFT, Movement, FALSE);    // Left for turning left
-												 //FyDefineHotKey(VK_DOWN, Movement, FALSE);
+	//FyDefineHotKey(VK_DOWN, Movement, FALSE);
 	FyDefineHotKey(FY_A, Attack, FALSE);
 	FyDefineHotKey(FY_S, Attack, FALSE);
 	//FyDefineHotKey(FY_D, Attack, FALSE);
@@ -269,13 +301,23 @@ void GameAI(int skip)
 
 	character.Play(LOOP, (float)skip, FALSE, TRUE);
 	enemy.Play(LOOP, (float)skip, FALSE, TRUE);
+	
+	if (mmID != FAILED_ID) {
+      FnMedia md;
+      md.Object(mmID);
+      if (md.GetState() == MEDIA_STOPPED) {
+        // after playing, delete the media object
+        FyDeleteMediaPlayer(mmID);
+        mmID = FAILED_ID;
+      }
+   }
 	/****************
 	process key conflict
 	forward: 1=forward 0=stand -1=backward
 	right: 1=turn right 0=stand -1=turn left
 	direction : 1 = same direction as camera -1 = opposite direction of camera
 	*****************/
-	int forward = 0,right = 0;
+	int forward = 0, right = 0;
 	if (FyCheckHotKeyStatus(VK_RIGHT))
 		right += 1;
 	if (FyCheckHotKeyStatus(VK_LEFT))
@@ -322,7 +364,7 @@ void GameAI(int skip)
 		if (direction == 3) {
 			character.TurnRight(90.0f);
 		}
-		else if(direction == 2) {
+		else if (direction == 2) {
 			character.TurnRight(-90.0f);
 		}
 		direction = 1;
@@ -403,14 +445,14 @@ void RenderIt(int skip)
 	}
 	//Do the hit test control
 	/*if (lyubuAction > 0 && lyubuAction%hitTest[curPoseID] == 0 && distBetweenTwoPoints(enemypos, actorPos) <= 115.0f) {
-		//hit
-		enemyPosID = actionDamage[curPoseID] > 1 ? damageH : damageL;
-		enemy.SetCurrentAction(NULL, 0, enemyPosID);
-		donzoAction = actionLength[enemyPosID];
-		enemyhp = enemyhp - actionDamage[curPoseID];
-		if (enemyhp <= 0) {
-			die();
-		}
+	//hit
+	enemyPosID = actionDamage[curPoseID] > 1 ? damageH : damageL;
+	enemy.SetCurrentAction(NULL, 0, enemyPosID);
+	donzoAction = actionLength[enemyPosID];
+	enemyhp = enemyhp - actionDamage[curPoseID];
+	if (enemyhp <= 0) {
+	die();
+	}
 	}*/
 	// if hp is lower then zero kill the stuff
 	//debug part
@@ -494,12 +536,16 @@ void Attack(BYTE code, BOOL4 value) {
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
+			
+			weapon1Sound.Play(ONCE);
 		}
 		else if (code == FY_S && (actor.GetCurrentAction(NULL) == runID || actor.GetCurrentAction(NULL) == idleID)) {
 			curPoseID = heavyAttackID[0];
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
+			
+			weapon2Sound.Play(ONCE);
 		}
 	}
 }
