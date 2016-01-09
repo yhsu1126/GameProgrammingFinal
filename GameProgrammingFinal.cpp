@@ -46,7 +46,7 @@ void Attack(BYTE, BOOL4); // the function to control the attack movement
 void die(); // just kill the enemy and make sure that he disappeared
 
 			// timer callbacks
-// mouse callbacks
+			// mouse callbacks
 void InitElevation(int, int);
 void ElevationCam(int, int);
 void DistanceCam(int, int, float);
@@ -103,37 +103,30 @@ void FyMain(int argc, char **argv)
 	FySetTexturePath("Data\\Characters");
 	FySetCharacterPath("Data\\Characters");
 	actorID = scene.LoadCharacter("Lyubu2");
-	scoutID = scene.LoadCharacter("Lyubu2");
 	enemyID = scene.LoadCharacter("Donzo2");
 
 	// put the character on terrain
 	float pos[3], fDir[3], uDir[3], enemypos[3], scoutpos[3];
-	FnCharacter actor, enemy, scout;
+	FnCharacter actor, enemy;
 	actor.ID(actorID);
 	enemy.ID(enemyID);
-	scout.ID(scoutID);
 
 	fstream infile;
-	infile.open("Data\\Scenes\\map\\map.txt", ios::in);
-	infile >> scoutpos[0] >> scoutpos[1] >> scoutpos[2];
-	infile >> enemypos[0] >> enemypos[1] >> enemypos[2];
+	infile.open("Data\\Scenes\\map\\map0.txt", ios::in);
 	infile >> pos[0] >> pos[1] >> pos[2];
+	infile >> fDir[0] >> fDir[1] >> fDir[2];
+	uDir[0] = 0.0f; uDir[1] = 0.0f; uDir[2] = 1.0f;
+	infile >> enemypos[0] >> enemypos[1] >> enemypos[2];
 	/*pos[0] = 3487.873; pos[1] = -3639.062f; pos[2] = 1000.0f;
 	enemypos[0] = 3540.0f; enemypos[1] = -4300.0f; enemypos[2] = 1000.0f;
 	scoutpos[0] = 3540.0f; scoutpos[1] = -3070.0f; scoutpos[2] = 1000.0f;*/
 	fDir[0] = 1.0f; fDir[1] = 1.0f; fDir[2] = 0.0f;
-	uDir[0] = 0.0f; uDir[1] = 0.0f; uDir[2] = 1.0f;
 	actor.SetDirection(fDir, uDir);
-	scout.SetDirection(fDir, uDir);
 	enemy.SetDirection(fDir, uDir);
 
 	actor.SetTerrainRoom(terrainRoomID, 10.0f);
 	enemy.SetTerrainRoom(terrainRoomID, 10.0f);
-	scout.SetTerrainRoom(terrainRoomID, 10.0f);
 	char msgbuf[1000];
-	beOK = scout.PutOnTerrain(scoutpos);
-	sprintf(msgbuf, "beok : %d\n", beOK);
-	OutputDebugString(_T(msgbuf));
 	beOK = enemy.PutOnTerrain(enemypos);
 	sprintf(msgbuf, "beok : %d\n", beOK);
 	OutputDebugString(_T(msgbuf));
@@ -201,8 +194,6 @@ void FyMain(int argc, char **argv)
 	curPoseID = idleID;
 	actor.SetCurrentAction(NULL, 0, curPoseID);
 	actor.Play(START, 0.0f, FALSE, TRUE);
-	scout.SetCurrentAction(NULL, 0, curPoseID);
-	scout.Play(LOOP, 0.0f, FALSE, TRUE);
 	actor.TurnRight(90.0f);
 	actor.GetDirection(fDir, uDir);
 	enemyPosID = enemyIdle;
@@ -245,13 +236,13 @@ void FyMain(int argc, char **argv)
 
 	// set Hotkeys
 	FyDefineHotKey(VK_ESCAPE, QuitGame, FALSE);  // escape for quiting the game
-	FyDefineHotKey(VK_UP, Movement, FALSE);      // Up for moving forward
+												 //FyDefineHotKey(VK_UP, Movement, FALSE);      // Up for moving forward
 	FyDefineHotKey(VK_RIGHT, Movement, FALSE);   // Right for turning right
 	FyDefineHotKey(VK_LEFT, Movement, FALSE);    // Left for turning left
-	FyDefineHotKey(VK_DOWN, Movement, FALSE);
+												 //FyDefineHotKey(VK_DOWN, Movement, FALSE);
 	FyDefineHotKey(FY_A, Attack, FALSE);
 	FyDefineHotKey(FY_S, Attack, FALSE);
-	FyDefineHotKey(FY_D, Attack, FALSE);
+	//FyDefineHotKey(FY_D, Attack, FALSE);
 
 	// define some mouse functions
 	FyBindMouseFunction(RIGHT_MOUSE, InitElevation, ElevationCam, NULL, NULL);
@@ -284,15 +275,7 @@ void GameAI(int skip)
 	right: 1=turn right 0=stand -1=turn left
 	direction : 1 = same direction as camera -1 = opposite direction of camera
 	*****************/
-	int forward = 0, right = 0;
-	if (FyCheckHotKeyStatus(VK_UP)) {
-		forward += 1;
-		direction = 1;
-	}
-	if (FyCheckHotKeyStatus(VK_DOWN)) {
-		forward -= 1;
-		direction = -1;
-	}
+	int forward = 0,right = 0;
 	if (FyCheckHotKeyStatus(VK_RIGHT))
 		right += 1;
 	if (FyCheckHotKeyStatus(VK_LEFT))
@@ -319,25 +302,36 @@ void GameAI(int skip)
 	}
 	if (right>0)
 	{
-		direction>0 ? dummy.TurnRight(2.0f*(float)direction) : dummy.TurnRight(-2.0f*(float)direction);
+		//direction>0 ? dummy.TurnRight(2.0f*(float)direction) : dummy.TurnRight(-2.0f*(float)direction);
 		//character.TurnRight(2.0f);
+		character.TurnRight(90.0f);
+		direction = 2;
 	}
 	else if (right<0)
 	{
-		direction>0 ? dummy.TurnRight(-2.0f*(float)direction) : dummy.TurnRight(2.0f*(float)direction);
+		//direction>0 ? dummy.TurnRight(-2.0f*(float)direction) : dummy.TurnRight(2.0f*(float)direction);
 		//character.TurnRight(-2.0f);
+		character.TurnRight(-90.0f);
+		direction = 3;
+
 	}
-	if (forward != 0 && (character.GetCurrentAction(NULL) == runID || character.GetCurrentAction(NULL) == ultimateAttack)) {
+	if (right != 0 && (character.GetCurrentAction(NULL) == runID || character.GetCurrentAction(NULL) == ultimateAttack)) {
 		character.MoveForward(dist, TRUE, FALSE, 0.0f, TRUE);
 	}
 	else {
+		if (direction == 3) {
+			character.TurnRight(90.0f);
+		}
+		else if(direction == 2) {
+			character.TurnRight(-90.0f);
+		}
 		direction = 1;
 	}
 	float pos[3];
 	character.GetPosition(pos);
 	dummy.SetPosition(pos);
 	followCam();
-	//adjustCam();
+	adjustCam();
 	enemyFollow(pos);
 }
 
@@ -420,7 +414,7 @@ void RenderIt(int skip)
 	}
 	// if hp is lower then zero kill the stuff
 	//debug part
-	FnText text;
+	/*FnText text;
 	text.ID(textID);
 
 	text.Begin(vID);
@@ -449,7 +443,7 @@ void RenderIt(int skip)
 	text.Write(uDirS, 20, 140, 0, 255, 0);
 	sprintf(posS, "donzoAction:%d", donzoAction);
 	text.Write(posS, 20, 160, 0, 255, 0);
-	text.End();
+	text.End();*/
 	//debug part end
 
 	// swap buffer
@@ -469,7 +463,7 @@ void Movement(BYTE code, BOOL4 value)
 	camera.ID(cID);
 	if (!value) {
 		if (curPoseID == runID) {
-			if (!FyCheckHotKeyStatus(VK_UP) && !FyCheckHotKeyStatus(VK_DOWN)) {
+			if (!FyCheckHotKeyStatus(VK_LEFT) && !FyCheckHotKeyStatus(VK_RIGHT)) {
 				curPoseID = idleID;
 				actor.SetCurrentAction(NULL, 0, curPoseID);
 				actor.Play(START, 0.0f, FALSE, TRUE);
@@ -479,7 +473,7 @@ void Movement(BYTE code, BOOL4 value)
 	}
 	else {
 		// If any key is pressed
-		if (code == VK_UP || code == VK_DOWN) {
+		if (code == VK_LEFT || code == VK_RIGHT) {
 			if (curPoseID == idleID) {
 				curPoseID = runID;
 				actor.SetCurrentAction(0, NULL, curPoseID);
@@ -501,22 +495,12 @@ void Attack(BYTE code, BOOL4 value) {
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
-			attackCombo += 1;
-			attackCombo %= 4;
 		}
 		else if (code == FY_S) {
 			curPoseID = attackCombo <3 ? heavyAttackID[attackCombo] : normalAttackID[attackCombo];
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
-			attackCombo = 0;
-		}
-		else if (code == FY_D) {
-			curPoseID = ultimateAttack;
-			actor.SetCurrentAction(0, NULL, curPoseID);
-			actor.Play(START, 0.0f, FALSE, TRUE);
-			lyubuAction = actionLength[curPoseID];
-			attackCombo = 0;
 		}
 	}
 }
