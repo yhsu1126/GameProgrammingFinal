@@ -1,5 +1,5 @@
+#pragma once
 #include "stdafx.h"
-#include "ArenaController.h"
 using namespace std;
 
 ArenaController::ArenaController(string sceneName, string Datapath, int goal, int mapid, int width, int height, string player1, string player2, int powerupAmount){

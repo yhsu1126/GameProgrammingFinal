@@ -1,9 +1,5 @@
 #pragma once
-#ifndef FLY2
-#define FLY2
-#include "library.h"
-#endif
-
+#include "stdafx.h"
 class Map;
 
 class Map {

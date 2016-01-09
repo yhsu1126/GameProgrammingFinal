@@ -1,10 +1,5 @@
-#include "stdafx.h"
 #pragma once
-#ifndef FLY2
-#define FLY2
-#include "library.h"
-#endif
-#include "Action.h"
+#include "stdafx.h"
 //big range is 240
 //small range is 80
 Action::Action(){

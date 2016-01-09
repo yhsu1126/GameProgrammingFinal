@@ -1,8 +1,7 @@
 #pragma once
-#ifndef FLY2
-#define FLY2
-#include "library.h"
-#endif
+#include "stdafx.h"
+#include "Action.h"
+#include "Effect.h"
 using namespace std;
 
 class Character : public FnCharacter {

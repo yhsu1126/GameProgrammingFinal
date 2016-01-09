@@ -1,10 +1,5 @@
 #pragma once
-#ifndef FLY2
-#define FLY2
-#include "string.h"
-#include "library.h"
-#endif
-
+#include "stdafx.h"
 using namespace std;
 
 class Action {
@@ -14,6 +9,7 @@ private:
 	string cwaname;
 	float speed;
 	float range;
+	int length;
 public:
     Action(); 
 	Action(string name, string cwaname, float speed, float range);

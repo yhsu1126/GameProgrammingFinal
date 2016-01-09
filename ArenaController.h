@@ -1,10 +1,5 @@
 #pragma once
-#ifndef FLY2
-#define FLY2
-#include "library.h"
-#endif
-#include "Map.h"
-#include "CharacterController.h"
+#include "stdafx.h"
 using namespace std;
 
 class ArenaController{
