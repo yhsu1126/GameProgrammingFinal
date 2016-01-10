@@ -56,6 +56,18 @@ FnAudio footStepSound, weapon1Sound, weapon2Sound;
 FnAudio lyubuDeathSound, donzoDeathSound;
 FnAudio hitWallSound,summonSound;
 
+<<<<<<< HEAD
+=======
+// Media
+MEDIAid mmID;
+AUDIOid backgroundSoundID, endGameSoundID;
+AUDIOid footStepSoundID, weapon1SoundID, weapon2SoundID;
+AUDIOid lyubuDeathSoundID, donzoDeathSoundID;
+FnAudio backgroundSound, endGameSound;
+FnAudio footStepSound, weapon1Sound, weapon2Sound;
+FnAudio lyubuDeathSound, donzoDeathSound;
+
+>>>>>>> origin/master
 // the centre of the rotation
 // float centre[3];
 float dist = 1000.0f, height = 75.0f, rotatedistancefactor = 0.017453f;
@@ -74,19 +86,20 @@ void Movement(BYTE, BOOL4); // The main stuff to do at here
 void Attack(BYTE, BOOL4); // the function to control the attack movement
 void die(); // just kill the enemy and make sure that he disappeared
 
-			// timer callbacks
-			// mouse callbacks
+// timer callbacks
+// mouse callbacks
 void InitElevation(int, int);
 void ElevationCam(int, int);
 void DistanceCam(int, int, float);
 void splitBall(unsigned int pos);
 int oldScroll, newScroll; //for test Mouse Scroll argument
 float dirScroll; //for test Mouse Scroll argument
-				 //camera follow function
+//camera follow function
 void followCam();
 void adjustCam();
 void enemyFollow(float*);
 float distBetweenTwoPoints(float*, float*);
+<<<<<<< HEAD
 void moveBall(int skip);
 void score(char name[],unsigned int score);
 void collisionItem(unsigned int pos, CHARACTERid itemID);
@@ -166,6 +179,40 @@ void DisplayItem(FnScene scene, float* uDir, float* fDir, FnCharacter Item, BOOL
 }
 // ------------------------------------------------
 
+=======
+
+void createAudio( void ) {
+	backgroundSoundID = FyCreateAudio();
+	backgroundSound.ID( backgroundSoundID );
+	backgroundSound.Load( "background" );
+	backgroundSound.Play( LOOP );
+	backgroundSound.SetVolume( 0.1 );
+	
+	endGameSoundID = FyCreateAudio();
+	endGameSound.ID(endGameSoundID);
+	endGameSound.Load("endGameSound");
+	
+	footStepSoundID = FyCreateAudio();
+	footStepSound.ID(footStepSoundID);
+	footStepSound.Load("footStep");
+	
+	weapon1SoundID = FyCreateAudio();
+	weapon1Sound.ID(weapon1SoundID);
+	weapon1Sound.Load("weapon1");
+	
+	weapon2SoundID = FyCreateAudio();
+	weapon2Sound.ID(weapon2SoundID);
+	weapon2Sound.Load("weapon2");
+	
+	lyubuDeathSoundID = FyCreateAudio();
+	lyubuDeathSound.ID(lyubuDeathSoundID);
+	lyubuDeathSound.Load("lyubuDeath");
+	
+	donzoDeathSoundID = FyCreateAudio();
+	donzoDeathSound.ID(donzoDeathSoundID);
+	donzoDeathSound.Load("donzoDeath");
+}
+>>>>>>> origin/master
 /*------------------
 the main program
 C.Wang 1010, 2014
@@ -181,10 +228,17 @@ void FyMain(int argc, char **argv)
 	FySetScenePath("Data\\Scenes");
 	FySetAudioPath("Data\\Media");
 	FyBeginMedia("Data\\Media", 2);
+<<<<<<< HEAD
 
 	// Load Media
 	createAudio();
 
+=======
+	
+	// Load Media
+	createAudio();
+	
+>>>>>>> origin/master
 	// create a viewport
 	vID = FyCreateViewport(0, 0, 1024, 768);
 	FnViewport vp;
@@ -200,14 +254,14 @@ void FyMain(int argc, char **argv)
 	//scene.Load("terrain");
 	scene.SetAmbientLights(1.0f, 1.0f, 1.0f, 0.6f, 0.6f, 0.6f); //Sky Light(1.0f), Ground Light (0.6f)
 
-																// load the terrain
+	// load the terrain
 	tID = scene.CreateObject(OBJECT);
 	FnObject terrain;
 	terrain.ID(tID);
 	BOOL beOK1 = terrain.Load("terrain");
 	terrain.Show(FALSE); // Can comment out this line of code to show the path which user can walk
 
-						 // set terrain environment
+	// set terrain environment
 	terrainRoomID = scene.CreateRoom(SIMPLE_ROOM, 10);
 	FnRoom room;
 	room.ID(terrainRoomID);
@@ -368,10 +422,10 @@ void FyMain(int argc, char **argv)
 
 	// set Hotkeys
 	FyDefineHotKey(VK_ESCAPE, QuitGame, FALSE);  // escape for quiting the game
-												 //FyDefineHotKey(VK_UP, Movement, FALSE);      // Up for moving forward
+	//FyDefineHotKey(VK_UP, Movement, FALSE);      // Up for moving forward
 	FyDefineHotKey(VK_RIGHT, Movement, FALSE);   // Right for turning right
 	FyDefineHotKey(VK_LEFT, Movement, FALSE);    // Left for turning left
-												 //FyDefineHotKey(VK_DOWN, Movement, FALSE);
+	//FyDefineHotKey(VK_DOWN, Movement, FALSE);
 	FyDefineHotKey(FY_A, Attack, FALSE);
 	FyDefineHotKey(FY_S, Attack, FALSE);
 	FyDefineHotKey(FY_Y, Restart, FALSE);
@@ -406,6 +460,7 @@ void GameAI(int skip)
 	character.Play(LOOP, (float)skip, FALSE, TRUE);
 	enemy.Play(LOOP, (float)skip, FALSE, TRUE);
 
+<<<<<<< HEAD
 	// ------------------------------------------------
 	// 20160110 - Item 
 	FnCharacter Item;
@@ -413,6 +468,8 @@ void GameAI(int skip)
 	Item.Play(LOOP, (float)skip, FALSE, TRUE);
 	// ------------------------------------------------
 
+=======
+>>>>>>> origin/master
 	/****************
 	process key conflict
 	forward: 1=forward 0=stand -1=backward
@@ -616,6 +673,7 @@ void RenderIt(int skip)
 		if (donzoAction <= 0) {
 			if (enemyPosID == dieID) {
 				enemy.Show(FALSE, FALSE, FALSE, FALSE);
+<<<<<<< HEAD
 				donzoDeathSound.Play(ONCE);
 			}
 			else if(enemyPosID == enemyRunID) {
@@ -636,6 +694,9 @@ void RenderIt(int skip)
 				enemyDirection = 1;
 				enemy.SetCurrentAction(NULL, 0, enemyIdle);
 				enemyPosID = enemyIdle;
+=======
+				donzoDeathSound.Play( ONCE );
+>>>>>>> origin/master
 			}
 			else {
 				enemy.SetCurrentAction(NULL, 0, enemyIdle);
@@ -663,7 +724,11 @@ void RenderIt(int skip)
 	}
 	}*/
 	// if hp is lower then zero kill the stuff
+<<<<<<< HEAD
 	ShowScore();
+=======
+
+>>>>>>> origin/master
 	// swap buffer
 	FySwapBuffers();
 }
@@ -696,7 +761,11 @@ void Movement(BYTE code, BOOL4 value)
 				curPoseID = runID;
 				actor.SetCurrentAction(0, NULL, curPoseID);
 				actor.Play(START, 0.0f, FALSE, TRUE);
+<<<<<<< HEAD
 				footStepSound.Play(ONCE);
+=======
+				footStepSound.Play( ONCE );
+>>>>>>> origin/master
 			}
 		}
 	}
@@ -713,6 +782,7 @@ void Attack(BYTE code, BOOL4 value) {
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
+<<<<<<< HEAD
 			weapon1Sound.Play(ONCE);
 			FnScene scene;
 			scene.ID(sID);
@@ -739,12 +809,17 @@ void Attack(BYTE code, BOOL4 value) {
 				float degree = (float)(rand() % 60) + 1.0f;
 				ball.TurnRight(degree);
 			}
+=======
+			
+			weapon1Sound.Play(ONCE);
+>>>>>>> origin/master
 		}
 		else if (code == FY_S && (actor.GetCurrentAction(NULL) == runID || actor.GetCurrentAction(NULL) == idleID)) {
 			curPoseID = normalAttackID[0];
 			actor.SetCurrentAction(0, NULL, curPoseID);
 			actor.Play(START, 0.0f, FALSE, TRUE);
 			lyubuAction = actionLength[curPoseID];
+<<<<<<< HEAD
 
 			weapon2Sound.Play(ONCE);
 			FnScene scene;
@@ -760,6 +835,10 @@ void Attack(BYTE code, BOOL4 value) {
 				actor.GetPosition(pos);
 				gxS.SetPlayLocation(pos);
 			}
+=======
+			
+			weapon2Sound.Play(ONCE);
+>>>>>>> origin/master
 		}
 	}
 }
@@ -772,7 +851,11 @@ void QuitGame(BYTE code, BOOL4 value)
 {
 	if (code == FY_ESCAPE) {
 		if (value) {
+<<<<<<< HEAD
 			endGameSound.Play(ONCE);
+=======
+			endGameSound.Play( ONCE );
+>>>>>>> origin/master
 			FyQuitFlyWin32();
 		}
 	}
@@ -986,6 +1069,7 @@ void die() {
 	enemy.SetCurrentAction(NULL, 0, dieID, FALSE, TRUE);
 	enemyPosID = dieID;
 	donzoAction = actionLength[enemyPosID];
+<<<<<<< HEAD
 	donzoDeathSound.Play(ONCE);
 }
 
@@ -1283,3 +1367,7 @@ void splitBall(unsigned int pos) {
 		speed.push_back(10.0f);
 	}
 }
+=======
+	donzoDeathSound.Play( ONCE );
+}
+>>>>>>> origin/master
