@@ -29,9 +29,12 @@ std::map<ACTIONid, int>actionLength, hitTest, actionDamage, hitTime, attackRange
 
 // Media
 MEDIAid mmID;
-AUDIOid backgroundSoundID, weapon1SoundID, weapon2SoundID;
-FnAudio backgroundSound, weapon1Sound, weapon2Sound;
-
+AUDIOid backgroundSoundID, endGameSoundID;
+AUDIOid footStepSoundID, weapon1SoundID, weapon2SoundID;
+AUDIOid lyubuDeathSoundID, donzoDeathSoundID;
+FnAudio backgroundSound, endGameSound;
+FnAudio footStepSound, weapon1Sound, weapon2Sound;
+FnAudio lyubuDeathSound, donzoDeathSound;
 
 // the centre of the rotation
 // float centre[3];
@@ -67,7 +70,16 @@ void createAudio( void ) {
 	backgroundSoundID = FyCreateAudio();
 	backgroundSound.ID( backgroundSoundID );
 	backgroundSound.Load( "background" );
-	// backgroundSound.Play( LOOP );
+	backgroundSound.Play( LOOP );
+	backgroundSound.SetVolume( 0.1 );
+	
+	endGameSoundID = FyCreateAudio();
+	endGameSound.ID(endGameSoundID);
+	endGameSound.Load("endGameSound");
+	
+	footStepSoundID = FyCreateAudio();
+	footStepSound.ID(footStepSoundID);
+	footStepSound.Load("footStep");
 	
 	weapon1SoundID = FyCreateAudio();
 	weapon1Sound.ID(weapon1SoundID);
@@ -76,6 +88,14 @@ void createAudio( void ) {
 	weapon2SoundID = FyCreateAudio();
 	weapon2Sound.ID(weapon2SoundID);
 	weapon2Sound.Load("weapon2");
+	
+	lyubuDeathSoundID = FyCreateAudio();
+	lyubuDeathSound.ID(lyubuDeathSoundID);
+	lyubuDeathSound.Load("lyubuDeath");
+	
+	donzoDeathSoundID = FyCreateAudio();
+	donzoDeathSound.ID(donzoDeathSoundID);
+	donzoDeathSound.Load("donzoDeath");
 }
 /*------------------
 the main program
@@ -93,14 +113,7 @@ void FyMain(int argc, char **argv)
 	FySetAudioPath("Data\\Media");
 	FyBeginMedia("Data\\Media", 2);
 	
-	// Load Media 
-	/*
-	mmID = FyCreateMediaPlayer("background4.mp3", 0, 0, 800, 600);
-	FnMedia mP;
-	mP.Object(mmID);
-	// mP.Play(ONCE);
-	// mP.SetVolume(0.1f);
-	*/
+	// Load Media
 	createAudio();
 	
 	// create a viewport
@@ -301,16 +314,7 @@ void GameAI(int skip)
 
 	character.Play(LOOP, (float)skip, FALSE, TRUE);
 	enemy.Play(LOOP, (float)skip, FALSE, TRUE);
-	
-	if (mmID != FAILED_ID) {
-      FnMedia md;
-      md.Object(mmID);
-      if (md.GetState() == MEDIA_STOPPED) {
-        // after playing, delete the media object
-        FyDeleteMediaPlayer(mmID);
-        mmID = FAILED_ID;
-      }
-   }
+
 	/****************
 	process key conflict
 	forward: 1=forward 0=stand -1=backward
@@ -429,6 +433,7 @@ void RenderIt(int skip)
 		if (donzoAction <= 0) {
 			if (enemyPosID == dieID) {
 				enemy.Show(FALSE, FALSE, FALSE, FALSE);
+				donzoDeathSound.Play( ONCE );
 			}
 			else {
 				enemy.SetCurrentAction(NULL, 0, enemyIdle);
@@ -441,6 +446,7 @@ void RenderIt(int skip)
 		if (lyubuAction <= 0) {
 			character.SetCurrentAction(NULL, 0, idleID);
 			curPoseID = idleID;
+			// footStepSound.Stop();
 		}
 	}
 	//Do the hit test control
@@ -455,38 +461,6 @@ void RenderIt(int skip)
 	}
 	}*/
 	// if hp is lower then zero kill the stuff
-	//debug part
-	/*FnText text;
-	text.ID(textID);
-
-	text.Begin(vID);
-	text.Write(string, 20, 20, 255, 0, 0);
-
-	char posS[256], fDirS[256], uDirS[256];
-	sprintf(posS, "pos: %8.3f %8.3f %8.3f", pos[0], pos[1], pos[2]);
-	sprintf(fDirS, "facing: %8.3f %8.3f %8.3f", fDir[0], fDir[1], fDir[2]);
-	sprintf(uDirS, "up: %8.3f %8.3f %8.3f", uDir[0], uDir[1], uDir[2]);
-
-	text.Write("camera", 20, 35, 0, 255, 0);
-	text.Write(posS, 20, 50, 0, 255, 0);
-	text.Write(fDirS, 20, 65, 0, 255, 0);
-	text.Write(uDirS, 20, 80, 0, 255, 0);
-
-	character.GetPosition(pos);
-	character.GetDirection(fDir, uDir);
-
-	sprintf(posS, "pos: %8.3f %8.3f %8.3f", pos[0], pos[1], pos[2]);
-	sprintf(fDirS, "facing: %8.3f %8.3f %8.3f", fDir[0], fDir[1], fDir[2]);
-	sprintf(uDirS, "up: %8.3f %8.3f %8.3f", uDir[0], uDir[1], uDir[2]);
-
-	text.Write("character", 20, 95, 0, 255, 0);
-	text.Write(posS, 20, 110, 0, 255, 0);
-	text.Write(fDirS, 20, 125, 0, 255, 0);
-	text.Write(uDirS, 20, 140, 0, 255, 0);
-	sprintf(posS, "donzoAction:%d", donzoAction);
-	text.Write(posS, 20, 160, 0, 255, 0);
-	text.End();*/
-	//debug part end
 
 	// swap buffer
 	FySwapBuffers();
@@ -520,6 +494,7 @@ void Movement(BYTE code, BOOL4 value)
 				curPoseID = runID;
 				actor.SetCurrentAction(0, NULL, curPoseID);
 				actor.Play(START, 0.0f, FALSE, TRUE);
+				footStepSound.Play( ONCE );
 			}
 		}
 	}
@@ -558,6 +533,7 @@ void QuitGame(BYTE code, BOOL4 value)
 {
 	if (code == FY_ESCAPE) {
 		if (value) {
+			endGameSound.Play( ONCE );
 			FyQuitFlyWin32();
 		}
 	}
@@ -722,4 +698,5 @@ void die() {
 	enemy.SetCurrentAction(NULL, 0, dieID, FALSE, TRUE);
 	enemyPosID = dieID;
 	donzoAction = actionLength[enemyPosID];
+	donzoDeathSound.Play( ONCE );
 }
