@@ -23,13 +23,14 @@ ACTIONid Item_Idle, Item_PoseID;
 bool Item_ShowFlag = FALSE;
 // ------------------------------------------------
 
-VIEWPORTid vID;                 // the major viewport
+VIEWPORTid vID,vID1;                 // the major viewport
 SCENEid sID;                    // the 3D scene
-OBJECTid cID, tID;              // the main camera and the terrain for terrain following
+OBJECTid cID, tID,cID1;              // the main camera and the terrain for terrain following
 OBJECTid dID;					//#dummy object for control character dir##
 OBJECTid winText[2];
 CHARACTERid actorID, enemyID, scoutID;            // the major character
 ACTIONid idleID, runID, curPoseID, ultimateAttack, enemyIdle, damageL, damageH, dieID, enemyPosID; // two actions
+float birdpos[3], birdfDir[3], birduDir[3];
 ACTIONid normalAttackID[4], heavyAttackID[3], enemyAttackID, enemyRunID;
 ROOMid terrainRoomID = FAILED_ID;
 TEXTid textID = FAILED_ID;
@@ -89,7 +90,7 @@ void enemyFollow(float*);
 float distBetweenTwoPoints(float*, float*);
 void moveBall(int skip);
 void score(char name[], unsigned int score);
-void collisionItem(unsigned int pos, CHARACTERid itemID);
+void collisionItem(unsigned int pos);
 void collisionCharacter(unsigned int pos, CHARACTERid actorID);
 void collisionEdge(unsigned int pos, int x, int y);
 void deleteBall(unsigned int pos);
@@ -101,8 +102,8 @@ void Restart(BYTE code, BOOL4 value);
 void createAudio(void) {
 	backgroundSoundID = FyCreateAudio();
 	backgroundSound.ID(backgroundSoundID);
-	backgroundSound.Load("background");
-	//backgroundSound.Play(LOOP);
+	backgroundSound.Load("daydream");
+	backgroundSound.Play(LOOP);
 	backgroundSound.SetVolume(0.1);
 
 	endGameSoundID = FyCreateAudio();
@@ -187,8 +188,10 @@ void FyMain(int argc, char **argv)
 
 	// create a viewport
 	vID = FyCreateViewport(0, 0, 1024, 768);
-	FnViewport vp;
+	vID1 = FyCreateViewport(824, 568, 200, 200);
+	FnViewport vp,vp1;
 	vp.ID(vID);
+	vp1.ID(vID1);
 
 	// create a 3D scene
 	sID = FyCreateScene(100);
@@ -321,7 +324,7 @@ void FyMain(int argc, char **argv)
 	curPoseID = idleID;
 	actor.SetCurrentAction(NULL, 0, curPoseID);
 	actor.Play(START, 0.0f, FALSE, TRUE);
-	actor.TurnRight(90.0f);
+	//actor.TurnRight(90.0f);
 	actor.GetDirection(fDir, uDir);
 	enemyPosID = enemyIdle;
 	enemy.SetCurrentAction(NULL, 0, enemyPosID);
@@ -329,11 +332,21 @@ void FyMain(int argc, char **argv)
 
 	// translate the camera
 	cID = scene.CreateObject(CAMERA);
-	FnCamera camera;
+	cID1 = scene.CreateObject(CAMERA);
+	FnCamera camera,camera1;
 	camera.ID(cID);
 	camera.SetNearPlane(5.0f);
 	camera.SetFarPlane(100000.0f);
 	camera.SetParent(actorID);
+	camera1.ID(cID1);
+	camera1.SetNearPlane(5.0f);
+	camera1.SetFarPlane(100000.0f);
+	camera1.SetParent(actorID);
+	infile >> birdpos[0] >> birdpos[1] >> birdpos[2];
+	infile >> birdfDir[0] >> birdfDir[1] >> birdfDir[2];
+	infile >> birduDir[0] >> birduDir[1] >> birduDir[2];
+	camera1.SetPosition(birdpos);
+	camera1.SetDirection(birdfDir, birduDir);
 	// set dummy position and direction to actor
 	dID = scene.CreateObject(OBJECT);
 	FnObject dummy;
@@ -359,7 +372,7 @@ void FyMain(int argc, char **argv)
 	lgt.SetIntensity(0.4f);
 
 	//initialize GameFx stuff
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 20; i++) {
 		gFXID[i] = FAILED_ID;
 	}
 
@@ -516,19 +529,22 @@ C.Wang 0720, 2006
 -----------------------*/
 void RenderIt(int skip)
 {
-	FnViewport vp;
+	FnViewport vp,vp1;
 
 	// render the whole scene
 	vp.ID(vID);
 	vp.Render3D(cID, TRUE, TRUE);
 	vp.RenderSprites(sID, FALSE, TRUE);
+	vp1.ID(vID1);
+	vp1.Render3D(cID1, TRUE, TRUE);
 	// get camera's data
-	FnCamera camera;
+	FnCamera camera,camera1;
 	FnCharacter character, enemy;
 	character.ID(actorID);
 	enemy.ID(enemyID);
 
 	camera.ID(cID);
+	camera1.ID(cID1);
 
 	float pos[3], fDir[3], uDir[3], enemypos[3], actorPos[3];
 	camera.GetPosition(pos);
@@ -536,6 +552,15 @@ void RenderIt(int skip)
 	camera.GetDirection(fDir, uDir);
 	enemy.GetPosition(enemypos);
 
+	camera1.SetPosition(birdpos);
+	camera1.SetDirection(birdfDir, birduDir);
+	char msgbuf[1000];
+	sprintf(msgbuf,"Camera at %f %f %f\n", birdpos[0], birdpos[1], birdpos[2]);
+	OutputDebugString(_T(msgbuf));
+	sprintf(msgbuf, "Camera facing %f %f %f\n", birdfDir[0], birdfDir[1], birdfDir[2]);
+	OutputDebugString(_T(msgbuf));
+	sprintf(msgbuf, "Camera uDir %f %f %f\n", birduDir[0], birduDir[1], birduDir[2]);
+	OutputDebugString(_T(msgbuf));
 
 
 	// show frame rate
@@ -1026,59 +1051,15 @@ void deleteBall(unsigned int pos) {
 }
 
 void collisionEdge(unsigned int pos, int x, int y) {
-	FnObject ball(ballId[pos]);
-	float xDir[3] = { 1.0f, 0.0f, 0.0f }, fDir[3], uDir[3];
-	ball.GetDirection(fDir, uDir);
-	float dot = 2 * FyDot(xDir, fDir);
-	for (int i = 0; i<3; i++)
-		fDir[i] -= dot * xDir[i];
-	ball.SetDirection(fDir, uDir);
-
-	hitWallSound.Play(ONCE);
-	FnScene scene;
-	scene.ID(sID);
-	if (gFXID[4 + pos] != NULL) {
-		scene.DeleteGameFXSystem(gFXID[4 + pos]);
-	}
-	gFXID[4 + pos] = scene.CreateGameFXSystem();
-	FnGameFXSystem gxS(gFXID[4 + pos]);
-	BOOL4 beOK = gxS.Load("Blow_01e", TRUE);
-	if (beOK) {
-		float pos[3];
-		ball.GetPosition(pos);
-		gxS.SetPlayLocation(pos);
-	}
-
-
-}
-
-void collisionCharacter(unsigned int pos, CHARACTERid characterID) {
-	FnCharacter character;
-	character.ID(characterID);
-	int hit = 0;
-	if (characterID == enemyID) {
-		if (character.GetCurrentAction(NULL) == enemyAttackID) {
-			hit = 1;
-		}
-	}
-	else if (characterID == actorID) {
+	try {
 		FnObject ball(ballId[pos]);
-		float pos[3];
-		ball.GetPosition(pos);
-		if (character.GetCurrentAction(NULL) == normalAttackID[2]) {
-			hit = 2;
-		}
-		else if (character.GetCurrentAction(NULL) == normalAttackID[0] && pos[1] >= scoreBoard[0] - 80) {
-			hit = 1;
-		}
-	}
-	if (hit > 0) {
-		float fDir[3], uDir[3];
-		character.GetDirection(fDir, uDir);
-		FnObject ball(ballId[pos]);
+		float xDir[3] = { 1.0f, 0.0f, 0.0f }, fDir[3], uDir[3];
+		ball.GetDirection(fDir, uDir);
+		float dot = 2 * FyDot(xDir, fDir);
+		for (int i = 0; i < 3; i++)
+			fDir[i] -= dot * xDir[i];
 		ball.SetDirection(fDir, uDir);
-		float degree = (float)(rand() % 60) + 1.0f;
-		ball.TurnRight(degree);
+
 		hitWallSound.Play(ONCE);
 		FnScene scene;
 		scene.ID(sID);
@@ -1087,31 +1068,48 @@ void collisionCharacter(unsigned int pos, CHARACTERid characterID) {
 		}
 		gFXID[4 + pos] = scene.CreateGameFXSystem();
 		FnGameFXSystem gxS(gFXID[4 + pos]);
-		BOOL4 beOK = gxS.Load("Tower_atk01_e", TRUE);
+		BOOL4 beOK = gxS.Load("Blow_01e", TRUE);
 		if (beOK) {
 			float pos[3];
 			ball.GetPosition(pos);
 			gxS.SetPlayLocation(pos);
 		}
 	}
-}
-void collisionItem(unsigned int pos) {
-	if (Item_ShowFlag == true) {
-		FnObject ball(ballId[pos]);
-		FnCharacter robber(Item_ID);
-		float xDir[3] = { 1.0f, 0.0f, 0.0f };
-		float fDir[3], uDir[3] = { 0.0f, 0.0f, 1.0f };
-		float posI[3], posB[3];
-		robber.GetPosition(posI);
-		ball.GetPosition(posB);
-		//避免z軸影響
-		posI[2] = 0.0f;
-		posB[2] = 0.0f;
+	catch (const out_of_range& oor) {
+		;
+	}
 
-		float dis = FyDistance(posI, posB);
-		//取得道具??
-		if (dis < 80.0f)
-		{
+}
+
+void collisionCharacter(unsigned int pos, CHARACTERid characterID) {
+	try {
+		FnCharacter character;
+		character.ID(characterID);
+		int hit = 0;
+		if (characterID == enemyID) {
+			if (character.GetCurrentAction(NULL) == enemyAttackID) {
+				hit = 1;
+			}
+		}
+		else if (characterID == actorID) {
+			FnObject ball(ballId[pos]);
+			float pos[3], characterpos[3];
+			ball.GetPosition(pos);
+			character.GetPosition(characterpos);
+			if (character.GetCurrentAction(NULL) == normalAttackID[2] && distBetweenTwoPoints(characterpos, pos) <= 120) {
+				hit = 2;
+			}
+			else if (character.GetCurrentAction(NULL) == normalAttackID[0] && distBetweenTwoPoints(characterpos, pos) <= 80) {
+				hit = 1;
+			}
+		}
+		if (hit > 0) {
+			float fDir[3], uDir[3];
+			character.GetDirection(fDir, uDir);
+			FnObject ball(ballId[pos]);
+			ball.SetDirection(fDir, uDir);
+			float degree = (float)(rand() % 60) + 1.0f;
+			ball.TurnRight(degree);
 			hitWallSound.Play(ONCE);
 			FnScene scene;
 			scene.ID(sID);
@@ -1126,9 +1124,51 @@ void collisionItem(unsigned int pos) {
 				ball.GetPosition(pos);
 				gxS.SetPlayLocation(pos);
 			}
-			Item_ShowFlag = false;
-			splitBall(pos);
 		}
+	}
+	catch (const out_of_range& oor) {
+		;
+	}
+}
+void collisionItem(unsigned int pos) {
+	try {
+		if (Item_ShowFlag == true) {
+			FnObject ball(ballId[pos]);
+			FnCharacter robber(Item_ID);
+			float xDir[3] = { 1.0f, 0.0f, 0.0f };
+			float fDir[3], uDir[3] = { 0.0f, 0.0f, 1.0f };
+			float posI[3], posB[3];
+			robber.GetPosition(posI);
+			ball.GetPosition(posB);
+			//避免z軸影響
+			posI[2] = 0.0f;
+			posB[2] = 0.0f;
+
+			float dis = FyDistance(posI, posB);
+			//取得道��E?
+			if (dis < 80.0f)
+			{
+				hitWallSound.Play(ONCE);
+				FnScene scene;
+				scene.ID(sID);
+				if (gFXID[4 + pos] != NULL) {
+					scene.DeleteGameFXSystem(gFXID[4 + pos]);
+				}
+				gFXID[4 + pos] = scene.CreateGameFXSystem();
+				FnGameFXSystem gxS(gFXID[4 + pos]);
+				BOOL4 beOK = gxS.Load("Tower_atk01_e", TRUE);
+				if (beOK) {
+					float pos[3];
+					ball.GetPosition(pos);
+					gxS.SetPlayLocation(pos);
+				}
+				Item_ShowFlag = false;
+				splitBall(pos);
+			}
+		}
+	}
+	catch (const out_of_range& oor) {
+		;
 	}
 }
 
@@ -1140,33 +1180,38 @@ void score(char name[], unsigned int position) {
 	deleteBall(position);
 }
 void moveBall(int skip) {
-	for (unsigned int i = 0; i<ballId.size(); i++) {
-		FnObject ball;
-		ball.ID(ballId[i]);
-		ball.MoveForward(speed[i], FALSE, FALSE, 0.0f, FALSE);
-		float pos[3], fDir[3], uDir[3];
-		ball.GetPosition(pos);
-		ball.GetDirection(fDir, uDir);
-		//條件判斷 邊界
-		if (pos[0] <= edgeBoard[0] && fDir[0]<0)
-			collisionEdge(i, edgeBoard[0], 0);
-		else if (pos[0] >= edgeBoard[1] && fDir[0]>0)
-			collisionEdge(i, edgeBoard[0], 0);
-		//條件判斷 腳色
-		if (pos[1] >= scoreBoard[0] - 120)
-			collisionCharacter(i, actorID);
-		else if (pos[1] <= scoreBoard[1] + 120)
-			collisionCharacter(i, enemyID);
-		//條件判斷 得分區
-		if (pos[1] >= scoreBoard[0]) {
-			//collisionEdge(i, scoreBoard[0], 0);
-			score("Lyubu", i);
+	try {
+		for (unsigned int i = 0; i < ballId.size(); i++) {
+			FnObject ball;
+			ball.ID(ballId[i]);
+			ball.MoveForward(speed[i], FALSE, FALSE, 0.0f, FALSE);
+			float pos[3], fDir[3], uDir[3];
+			ball.GetPosition(pos);
+			ball.GetDirection(fDir, uDir);
+			//條件判斷 邊界
+			if (pos[0] <= edgeBoard[0] && fDir[0] < 0)
+				collisionEdge(i, edgeBoard[0], 0);
+			else if (pos[0] >= edgeBoard[1] && fDir[0]>0)
+				collisionEdge(i, edgeBoard[0], 0);
+			//條件判斷 腳��E
+			if (pos[1] >= scoreBoard[0] - 120)
+				collisionCharacter(i, actorID);
+			else if (pos[1] <= scoreBoard[1] + 120)
+				collisionCharacter(i, enemyID);
+			//條件判斷 得分區
+			if (pos[1] >= scoreBoard[0]) {
+				//collisionEdge(i, scoreBoard[0], 0);
+				score("Lyubu", i);
+			}
+			else if (pos[1] <= scoreBoard[1]) {
+				//collisionEdge(i, scoreBoard[1], 0);
+				score("Donzo", i);
+			}
+			collisionItem(i);
 		}
-		else if (pos[1] <= scoreBoard[1]) {
-			//collisionEdge(i, scoreBoard[1], 0);
-			score("Donzo", i);
-		}
-		collisionItem(i);
+	}
+	catch (const out_of_range& oor) {
+		;
 	}
 }
 
@@ -1210,7 +1255,7 @@ void ShowScore() {
 			FnSprite text(winText[i]);
 			text.Show(FALSE);
 		}
-		if (ballId.size() == 0 && (scoreActor >= 3 || scoreEnemy >= 3))
+		if (scoreActor >= 3 || scoreEnemy >= 3)
 			GameState = 0;
 	}
 	else {
